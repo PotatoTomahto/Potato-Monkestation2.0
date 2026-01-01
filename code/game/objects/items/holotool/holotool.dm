@@ -36,41 +36,39 @@
 	. += span_info("Attack self to select tool modes.")
 
 // Welding tool repair is currently hardcoded and not based on tool behavior
-/obj/item/holotool/attack(mob/living/attacked_humanoid, mob/living/user)
-	if(!ishuman(attacked_humanoid) || (user.istate & ISTATE_HARM))
-		return ..()
+/obj/item/holotool/interact_with_atom(atom/interacting_with, mob/living/user, list/modifiers)
+	if(!ishuman(interacting_with) || user.istate & ISTATE_HARM)
+		return NONE
 
-	if(tool_behaviour == TOOL_WELDER && try_heal_loop(attacked_humanoid, user))
-		return TRUE
+	if(tool_behaviour == TOOL_WELDER)
+		return try_heal_loop(interacting_with, user)
 
-	return ..()
+	return NONE
 
 /obj/item/holotool/proc/try_heal_loop(atom/interacting_with, mob/living/user, repeating = FALSE)
 	var/mob/living/carbon/human/attacked_humanoid = interacting_with
 	var/obj/item/bodypart/affecting = attacked_humanoid.get_bodypart(check_zone(user.zone_selected))
-	if(tool_behaviour != TOOL_WELDER || isnull(affecting) || !IS_ROBOTIC_LIMB(affecting))
-		return
+	if(isnull(affecting) || !IS_ROBOTIC_LIMB(affecting))
+		return NONE
 
-	// From here, block item interactions
-	. = TRUE
-
-	if(!affecting.brute_dam)
+	if (!affecting.brute_dam)
 		balloon_alert(user, "limb not damaged")
-		return
+		return ITEM_INTERACT_BLOCKING
 
+	user.visible_message(span_notice("[user] starts to fix some of the dents on [attacked_humanoid == user ? user.p_their() : "[attacked_humanoid]'s"] [affecting.name]."),
+		span_notice("You start fixing some of the dents on [attacked_humanoid == user ? "your" : "[attacked_humanoid]'s"] [affecting.name]."))
 	var/use_delay = repeating ? 1 SECONDS : 0
 	if(user == attacked_humanoid)
 		use_delay = 5 SECONDS
 
-	user.visible_message(span_notice("[user] starts to fix some of the dents on [attacked_humanoid == user ? user.p_their() : "[attacked_humanoid]'s"] [affecting.name]."),
-		span_notice("You start fixing some of the dents on [attacked_humanoid == user ? "your" : "[attacked_humanoid]'s"] [affecting.name]."))
 	if(!use_tool(attacked_humanoid, user, use_delay, volume=50, amount=1))
-		return
-	if(!item_heal_robotic(attacked_humanoid, user, 15, 0))
-		return
+		return ITEM_INTERACT_BLOCKING
+
+	if(!item_heal_robotic(attacked_humanoid, user, brute_heal = 15, burn_heal = 0))
+		return ITEM_INTERACT_BLOCKING
 
 	INVOKE_ASYNC(src, PROC_REF(try_heal_loop), interacting_with, user, TRUE)
-	return
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/holotool/use(used)
 	SHOULD_CALL_PARENT(FALSE)
