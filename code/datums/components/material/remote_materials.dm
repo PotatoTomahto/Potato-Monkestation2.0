@@ -175,8 +175,7 @@ handles linking back and forth.
 		silo = new_silo
 		silo.ore_connected_machines += src
 		mat_container = new_container
-		UnregisterSignal(parent, COMSIG_ATOM_ITEM_INTERACTION)
-		UnregisterSignal(parent, COMSIG_ATOM_ITEM_INTERACTION_SECONDARY)
+		UnregisterSignal(parent, list(COMSIG_ATOM_ITEM_INTERACTION, COMSIG_ATOM_ITEM_INTERACTION_SECONDARY))
 		if(!(mat_container_flags & MATCONTAINER_NO_INSERT))
 			RegisterSignal(parent, COMSIG_ATOM_ITEM_INTERACTION, PROC_REF(on_item_insert))
 			RegisterSignal(parent, COMSIG_ATOM_ITEM_INTERACTION_SECONDARY, PROC_REF(on_secondary_insert))

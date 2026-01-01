@@ -393,7 +393,7 @@
 /datum/objective_item/steal/holotool
 	name = "the holotool."
 	targetitem = /obj/item/holotool
-	excludefromjob = list("Research Director")
+	excludefromjob = list(JOB_RESEARCH_DIRECTOR)
 
 // Doesn't need item_owner = (JOB_AI) because this handily functions as a murder objective if there isn't one
 /datum/objective_item/steal/functionalai
