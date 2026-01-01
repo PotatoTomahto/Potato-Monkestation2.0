@@ -87,10 +87,12 @@
 
 /obj/machinery/computer/mechpad/multitool_act(mob/living/user, obj/item/multitool/multi)
 	. = NONE
-	if(!istype(multi.buffer, /obj/machinery/mechpad))
+
+	var/datum/buffer = multitool_get_buffer(multi)
+	if(!istype(buffer, /obj/machinery/mechpad))
 		return ITEM_INTERACT_BLOCKING
 
-	var/obj/machinery/mechpad/buffered_pad = multi.buffer
+	var/obj/machinery/mechpad/buffered_pad = buffer
 	if(!(mechpads.len < maximum_pads))
 		to_chat(user, span_warning("[src] cannot handle any more connections!"))
 		return TRUE
@@ -100,11 +102,11 @@
 		if(buffered_pad in mechpads)
 			remove_pad(buffered_pad)
 		connect_launchpad(buffered_pad)
-		multi.set_buffer(null)
+		multitool_set_buffer(multi, null)
 		to_chat(user, span_notice("You connect the console to the pad with data from the [multi.name]'s buffer."))
 	else
 		add_pad(buffered_pad)
-		multi.set_buffer(null)
+		multitool_set_buffer(multi, null)
 		to_chat(user, span_notice("You upload the data from the [multi.name]'s buffer."))
 
 /obj/machinery/computer/mechpad/proc/add_pad(obj/machinery/mechpad/pad)

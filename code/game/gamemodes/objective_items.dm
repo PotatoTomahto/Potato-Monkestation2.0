@@ -390,6 +390,11 @@
 /datum/objective_item/steal/supermatter/target_exists()
 	return GLOB.main_supermatter_engine != null
 
+/datum/objective_item/steal/holotool
+	name = "the holotool."
+	targetitem = /obj/item/holotool
+	excludefromjob = list("Research Director")
+
 // Doesn't need item_owner = (JOB_AI) because this handily functions as a murder objective if there isn't one
 /datum/objective_item/steal/functionalai
 	name = "a functional AI"
