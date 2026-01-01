@@ -131,6 +131,29 @@
 	SIGNAL_HANDLER
 	buffer = null
 
+/**
+ * Sets the multitool component buffer
+ *
+ * Arguments:
+ * * buffer - the new object to assign to the multitool's component buffer
+ */
+/obj/item/multitool/proc/set_component_buffer(datum/component_buffer)
+	if(src.component_buffer)
+		UnregisterSignal(src.component_buffer, COMSIG_QDELETING)
+	src.component_buffer = component_buffer
+	if(!QDELETED(component_buffer))
+		RegisterSignal(component_buffer, COMSIG_QDELETING, PROC_REF(on_component_buffer_del))
+
+/**
+ * Called when the buffer's stored component buffer is deleted
+ *
+ * This proc does not clear the component buffer of the multitool, it is here to
+ * handle the deletion of the object the buffer references
+ */
+/obj/item/multitool/proc/on_component_buffer_del(datum/source)
+	SIGNAL_HANDLER
+	component_buffer = null
+
 // Syndicate device disguised as a multitool; it will turn red when an AI camera is nearby.
 
 /obj/item/multitool/ai_detect
