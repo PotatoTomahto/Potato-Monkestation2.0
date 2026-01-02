@@ -30,7 +30,7 @@
 
 /obj/item/holotool/Initialize(mapload)
 	. = ..()
-	RegisterSignal(src, COMSIG_ATOM_MULTITOOL_GET_BUFFER, PROC_REF(get_buffer))
+	RegisterSignal(src, COMSIG_ATOM_MULTITOOL_GET_BUFFER, PROC_REF(get_buffer_on_signal))
 	AddElement(/datum/element/update_icon_updates_onmob, ITEM_SLOT_HANDS|ITEM_SLOT_BELT)
 	if(!length(possible_modes))
 		build_listing()
@@ -180,7 +180,7 @@
 	src.buffer = WEAKREF(buffer)
 
 /// This proc is for datums sending COMSIG_ATOM_MULTITOOL_GET_BUFFER so multitool_get_buffer doesn't need to be a datum proc
-/obj/item/holotool/proc/get_buffer(datum/source, list/buffer_result)
+/obj/item/holotool/proc/get_buffer_on_signal(datum/source, list/buffer_result)
 	SIGNAL_HANDLER
 	buffer_result += buffer?.resolve()
 
