@@ -6,17 +6,17 @@
 	var/speed = 1.2 // 20% worse than regular tools by default
 	var/requires_emag = FALSE
 
-/datum/holotool_mode/proc/on_set(obj/item/holotool/H)
-	H.usesound = sound ? sound : 'sound/items/pshoom.ogg'
-	H.toolspeed = speed ? speed : 1
-	H.tool_behaviour = behavior ? behavior : null
-	H.sharpness = sharpness ? sharpness : NONE
+/datum/holotool_mode/proc/on_set(obj/item/holotool/holotool)
+	holotool.usesound = sound ? sound : 'sound/items/pshoom.ogg'
+	holotool.toolspeed = speed ? speed : 1
+	holotool.tool_behaviour = behavior ? behavior : null
+	holotool.sharpness = sharpness ? sharpness : NONE
 
-/datum/holotool_mode/proc/on_unset(obj/item/holotool/H)
-	H.usesound = initial(H.usesound)
-	H.toolspeed = initial(H.toolspeed)
-	H.tool_behaviour = initial(H.tool_behaviour)
-	H.sharpness = initial(H.sharpness)
+/datum/holotool_mode/proc/on_unset(obj/item/holotool/holotool)
+	holotool.usesound = initial(holotool.usesound)
+	holotool.toolspeed = initial(holotool.toolspeed)
+	holotool.tool_behaviour = initial(holotool.tool_behaviour)
+	holotool.sharpness = initial(holotool.sharpness)
 
 ////////////////////////////////////////////////
 
@@ -56,13 +56,13 @@
 	sound = list('sound/items/welder.ogg', 'sound/items/welder2.ogg')//so it actually gives the expected feedback from welding
 	behavior = TOOL_WELDER
 
-/datum/holotool_mode/welder/on_set(obj/item/holotool/H)
+/datum/holotool_mode/welder/on_set(obj/item/holotool/holotool)
 	..()
-	H.AddElement(/datum/element/tool_flash, H.light_outer_range)
+	holotool.AddElement(/datum/element/tool_flash, holotool.light_outer_range)
 
-/datum/holotool_mode/welder/on_unset(obj/item/holotool/H)
+/datum/holotool_mode/welder/on_unset(obj/item/holotool/holotool)
 	..()
-	H.RemoveElement(/datum/element/tool_flash, H.light_outer_range)
+	holotool.RemoveElement(/datum/element/tool_flash, holotool.light_outer_range)
 
 ////////////////////////////////////////////////
 
@@ -72,18 +72,18 @@
 	sharpness = SHARP_EDGED
 	requires_emag = TRUE
 
-/datum/holotool_mode/knife/on_set(obj/item/holotool/H)
+/datum/holotool_mode/knife/on_set(obj/item/holotool/holotool)
 	..()
-	H.force = 17
-	H.attack_verb_continuous = list("sliced", "torn", "cut")
-	H.armour_penetration = 45
-	H.embedding = list("embed_chance" = 40, "embedded_fall_chance" = 0, "embedded_pain_multiplier" = 5)
-	H.hitsound = 'sound/weapons/blade1.ogg'
+	holotool.force = 17
+	holotool.attack_verb_continuous = list("sliced", "torn", "cut")
+	holotool.armour_penetration = 45
+	holotool.embedding = list("embed_chance" = 40, "embedded_fall_chance" = 0, "embedded_pain_multiplier" = 5)
+	holotool.hitsound = 'sound/weapons/blade1.ogg'
 
-/datum/holotool_mode/knife/on_unset(obj/item/holotool/H)
+/datum/holotool_mode/knife/on_unset(obj/item/holotool/holotool)
 	..()
-	H.force = initial(H.force)
-	H.attack_verb_continuous = initial(H.attack_verb_continuous)
-	H.armour_penetration = initial(H.armour_penetration)
-	H.embedding = initial(H.embedding)
-	H.hitsound = initial(H.hitsound)
+	holotool.force = initial(holotool.force)
+	holotool.attack_verb_continuous = initial(holotool.attack_verb_continuous)
+	holotool.armour_penetration = initial(holotool.armour_penetration)
+	holotool.embedding = initial(holotool.embedding)
+	holotool.hitsound = initial(holotool.hitsound)
