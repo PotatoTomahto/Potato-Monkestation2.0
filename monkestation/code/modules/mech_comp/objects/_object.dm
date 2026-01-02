@@ -96,10 +96,10 @@
 /obj/item/mcobject/proc/multitool_get_comp_buffer(obj/item/tool)
 	if(istype(tool, /obj/item/multitool))
 		var/obj/item/multitool/multi = tool
-		return multi.component_buffer
+		return multi.component_buffer?.resolve()
 	if(istype(tool, /obj/item/holotool))
 		var/obj/item/holotool/holo = tool
-		return holo.comp_buffer
+		return holo.comp_buffer?.resolve()
 
 /obj/item/mcobject/proc/multitool_set_comp_buffer(obj/item/tool, comp_buffer_value)
 	if(istype(tool, /obj/item/multitool))

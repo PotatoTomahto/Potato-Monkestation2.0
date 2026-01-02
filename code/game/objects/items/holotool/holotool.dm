@@ -16,23 +16,42 @@
 	light_outer_range = 3
 	light_on = FALSE
 
+	///List of all modes this holotool can use.
+	var/static/list/datum/holotool_mode/possible_modes = list()
+	///List of all emagged modes.
+	var/static/list/datum/holotool_mode/emagged_modes = list()
 	/// The current mode
 	var/datum/holotool_mode/current_tool
 	var/current_light_color = "#48D1CC" //mediumturquoise
 	/// Buffer used by the multitool mode
-	var/datum/buffer
+	var/datum/weakref/buffer
 	/// Component buffer
-	var/datum/comp_buffer
+	var/datum/weakref/comp_buffer
 
 /obj/item/holotool/Initialize(mapload)
 	. = ..()
+	RegisterSignal(src, COMSIG_ATOM_MULTITOOL_GET_BUFFER, PROC_REF(get_buffer))
 	AddElement(/datum/element/update_icon_updates_onmob, ITEM_SLOT_HANDS|ITEM_SLOT_BELT)
+	if(!length(possible_modes))
+		build_listing()
+
+/obj/item/holotool/proc/build_listing()
+	for(var/datum/holotool_mode/mode as anything in subtypesof(/datum/holotool_mode))
+		mode = new mode()
+		var/image/holotool_img = image(icon = icon, icon_state = icon_state)
+		var/image/tool_img = image(icon = icon, icon_state = mode::name)
+		tool_img.color = current_light_color
+		holotool_img.overlays += tool_img
+		if(mode.requires_emag)
+			emagged_modes[mode] = holotool_img
+		else
+			possible_modes[mode] = holotool_img
 
 /obj/item/holotool/examine(mob/user)
 	. = ..()
 	. += span_notice("It is currently set to the [current_tool ? current_tool.name : "off"] mode.")
 	if(tool_behaviour == TOOL_MULTITOOL)
-		. += span_notice("Its buffer [buffer ? "contains [buffer]." : "is empty."]")
+		. += span_notice("Its buffer [buffer?.resolve() ? "contains [buffer.resolve()]." : "is empty."]")
 	. += span_info("Attack self to select tool modes.")
 
 // Welding tool repair is currently hardcoded and not based on tool behavior
@@ -81,10 +100,10 @@
 	if(istype(action, /datum/action/item_action/change_tool))
 		return ..()
 	else if(istype(action, /datum/action/item_action/change_ht_color))
-		var/C = input(user, "Select Color", "Select Color", "#48D1CC") as null|color
-		if(!C || QDELETED(src) || !user?.Adjacent(src))
+		var/chosen_color = tgui_color_picker(user, "Select Color", "[src]", "#48D1CC")
+		if(!chosen_color || QDELETED(src) || IS_DEAD_OR_INCAP(user) || !user.is_holding(src))
 			return
-		current_light_color = C
+		current_light_color = chosen_color
 		set_light_color(current_light_color)
 		update_appearance(UPDATE_ICON)
 
@@ -97,19 +116,8 @@
 	playsound(loc, 'sound/items/holotool.ogg', 100, 1, -1)
 	update_appearance(UPDATE_ICON)
 
-/obj/item/holotool/proc/build_listing()
-	var/list/possible_modes = list()
-	for(var/A in subtypesof(/datum/holotool_mode))
-		var/datum/holotool_mode/M = new A
-		if(M.can_be_used(src))
-			var/image/holotool_img = image(icon = icon, icon_state = icon_state)
-			var/image/tool_img = image(icon = icon, icon_state = M.name)
-			tool_img.color = current_light_color
-			holotool_img.overlays += tool_img
-			possible_modes[M] = holotool_img
-		else
-			qdel(M)
-	return possible_modes
+/obj/item/holotool/proc/return_usable_modes()
+	return (obj_flags & EMAGGED) ? possible_modes + emagged_modes : possible_modes
 
 // Handles color overlay of current holotool mode
 /obj/item/holotool/update_overlays()
@@ -142,9 +150,15 @@
 	return TRUE
 
 /obj/item/holotool/attack_self(mob/user)
-	var/list/possible_choices = build_listing()
-	var/chosen = show_radial_menu(user, src, possible_choices, custom_check = CALLBACK(src, PROC_REF(check_menu), user), require_near = TRUE)
-	if(!chosen)
+	var/list/possible_choices = return_usable_modes()
+	var/datum/holotool_mode/chosen = show_radial_menu(
+		user = user,
+		anchor = src,
+		choices = possible_choices,
+		custom_check = CALLBACK(src, PROC_REF(check_menu), user),
+		require_near = TRUE,
+	)
+	if(isnull(chosen))
 		return
 	switch_tool(user, chosen)
 
@@ -163,21 +177,12 @@
  * * buffer - the new object to assign to the multitool's buffer
  */
 /obj/item/holotool/proc/set_buffer(datum/buffer)
-	if(src.buffer)
-		UnregisterSignal(src.buffer, COMSIG_QDELETING)
-	src.buffer = buffer
-	if(!QDELETED(buffer))
-		RegisterSignal(buffer, COMSIG_QDELETING, PROC_REF(on_buffer_del))
+	src.buffer = WEAKREF(buffer)
 
-/**
- * Called when the buffer's stored object is deleted
- *
- * This proc does not clear the buffer of the multitool, it is here to
- * handle the deletion of the object the buffer references
- */
-/obj/item/holotool/proc/on_buffer_del(datum/source)
+/// This proc is for datums sending COMSIG_ATOM_MULTITOOL_GET_BUFFER so multitool_get_buffer doesn't need to be a datum proc
+/obj/item/holotool/proc/get_buffer(datum/source, list/buffer_result)
 	SIGNAL_HANDLER
-	buffer = null
+	buffer_result += buffer?.resolve()
 
 /**
  * Sets the holotool component buffer
@@ -186,18 +191,4 @@
  * * buffer - the new object to assign to the holotool's component buffer
  */
 /obj/item/holotool/proc/set_comp_buffer(datum/comp_buffer)
-	if(src.comp_buffer)
-		UnregisterSignal(src.comp_buffer, COMSIG_QDELETING)
-	src.comp_buffer = comp_buffer
-	if(!QDELETED(comp_buffer))
-		RegisterSignal(comp_buffer, COMSIG_QDELETING, PROC_REF(on_comp_buffer_del))
-
-/**
- * Called when the buffer's stored component buffer is deleted
- *
- * This proc does not clear the component buffer of the holotool, it is here to
- * handle the deletion of the object the buffer references
- */
-/obj/item/holotool/proc/on_comp_buffer_del(datum/source)
-	SIGNAL_HANDLER
-	comp_buffer = null
+	src.comp_buffer = WEAKREF(comp_buffer)

@@ -144,11 +144,13 @@ handles linking back and forth.
 
 	return COMPONENT_NO_AFTERATTACK
 
-/datum/component/remote_materials/proc/OnMultitool(datum/source, mob/user, obj/item/multitool/M)
+/datum/component/remote_materials/proc/OnMultitool(datum/source, mob/user, obj/item/multitool/multitool)
 	SIGNAL_HANDLER
 
 	. = NONE
-	var/datum/buffer = multitool_get_buffer(M)
+	var/list/buffer_result = list() // because signals only send bitflags
+	SEND_SIGNAL(multitool, COMSIG_ATOM_MULTITOOL_GET_BUFFER, buffer_result)
+	var/datum/buffer = length(buffer_result) ? buffer_result[1] : null
 	if (!QDELETED(buffer) && istype(buffer, /obj/machinery/ore_silo))
 		if (silo == buffer)
 			to_chat(user, span_warning("[parent] is already connected to [silo]!"))

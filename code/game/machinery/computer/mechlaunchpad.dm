@@ -95,7 +95,7 @@
 	var/obj/machinery/mechpad/buffered_pad = buffer
 	if(!(mechpads.len < maximum_pads))
 		to_chat(user, span_warning("[src] cannot handle any more connections!"))
-		return TRUE
+		return ITEM_INTERACT_SUCCESS
 	if(buffered_pad == connected_mechpad)
 		to_chat(user, span_warning("[src] cannot connect to its own mechpad!"))
 	else if(!connected_mechpad && buffered_pad == find_pad())
@@ -108,6 +108,7 @@
 		add_pad(buffered_pad)
 		multitool_set_buffer(multi, null)
 		to_chat(user, span_notice("You upload the data from the [multi.name]'s buffer."))
+	return ITEM_INTERACT_SUCCESS
 
 /obj/machinery/computer/mechpad/proc/add_pad(obj/machinery/mechpad/pad)
 	mechpads += pad

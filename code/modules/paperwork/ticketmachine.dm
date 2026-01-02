@@ -116,7 +116,8 @@ MAPPING_DIRECTIONAL_HELPERS(/obj/machinery/ticket_machine, 32)
 	controller.ticket_machine_ref = WEAKREF(buffer)
 	id = null
 	controller.id = null
-	to_chat(user, span_warning("You've linked [src] to [buffer]."))
+	to_chat(user, span_notice("You link [src] to [buffer]."))
+	return ITEM_INTERACT_SUCCESS
 
 /obj/item/assembly/control/ticket_machine
 	name = "ticket machine controller"

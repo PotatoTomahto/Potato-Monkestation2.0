@@ -29,7 +29,9 @@
 /datum/computer_file/program/science/application_attackby(obj/item/attacking_item, mob/living/user)
 	if(!istype(attacking_item) || attacking_item.tool_behaviour != TOOL_MULTITOOL)
 		return FALSE
-	var/datum/buffer = multitool_get_buffer(attacking_item)
+	var/list/buffer_result = list() // because signals only send bitflags
+	SEND_SIGNAL(attacking_item, COMSIG_ATOM_MULTITOOL_GET_BUFFER, buffer_result)
+	var/datum/buffer = length(buffer_result) ? buffer_result[1] : null
 	if(!QDELETED(buffer) && istype(buffer, /datum/techweb))
 		stored_research = buffer
 	return TRUE

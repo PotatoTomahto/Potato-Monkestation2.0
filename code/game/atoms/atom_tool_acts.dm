@@ -284,6 +284,26 @@
 /atom/proc/multitool_act_secondary(mob/living/user, obj/item/tool)
 	return
 
+/// Atom-level proc to return a multitool's buffer if it has one. Used to support different multitool types.
+/atom/proc/multitool_get_buffer(obj/item/tool)
+	if(istype(tool, /obj/item/multitool))
+		var/obj/item/multitool/multi = tool
+		return multi.buffer?.resolve()
+	if(istype(tool, /obj/item/holotool))
+		var/obj/item/holotool/holo = tool
+		return holo.buffer?.resolve()
+
+/// Atom-level proc to set the value of a multitool's buffer. Used to support different multitool types.
+/atom/proc/multitool_set_buffer(obj/item/tool, buffer_value)
+	if(istype(tool, /obj/item/multitool))
+		var/obj/item/multitool/multi = tool
+		multi.set_buffer(buffer_value)
+		return TRUE
+	if(istype(tool, /obj/item/holotool))
+		var/obj/item/holotool/holo = tool
+		holo.set_buffer(buffer_value)
+		return TRUE
+
 /// Called on an object when a tool with screwdriver capabilities is used to left click an object
 /atom/proc/screwdriver_act(mob/living/user, obj/item/tool)
 	return
