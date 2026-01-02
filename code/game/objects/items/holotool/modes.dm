@@ -4,9 +4,7 @@
 	var/behavior
 	var/sharpness
 	var/speed = 1.2 // 20% worse than regular tools by default
-
-/datum/holotool_mode/proc/can_be_used(obj/item/holotool/H)
-	return TRUE
+	var/requires_emag = FALSE
 
 /datum/holotool_mode/proc/on_set(obj/item/holotool/H)
 	H.usesound = sound ? sound : 'sound/items/pshoom.ogg'
@@ -72,9 +70,7 @@
 	name = "holo-knife"
 	sound = 'sound/weapons/blade1.ogg'
 	sharpness = SHARP_EDGED
-
-/datum/holotool_mode/knife/can_be_used(obj/item/holotool/H)
-	return (H.obj_flags & EMAGGED)
+	requires_emag = TRUE
 
 /datum/holotool_mode/knife/on_set(obj/item/holotool/H)
 	..()
