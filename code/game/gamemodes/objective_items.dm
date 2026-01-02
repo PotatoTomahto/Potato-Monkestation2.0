@@ -187,6 +187,15 @@
 /obj/item/storage/belt/utility/chief/add_stealing_item_objective()
 	return add_item_to_steal(src, /obj/item/storage/belt/utility/chief)
 
+/datum/objective_item/steal/traitor/research_director_holotool
+	name = "the research director's holotool."
+	targetitem = /obj/item/holotool
+	excludefromjob = list(JOB_RESEARCH_DIRECTOR)
+	exists_on_map = TRUE
+
+/obj/item/holotool/add_stealing_item_objective()
+	return add_item_to_steal(src, /obj/item/holotool)
+
 /datum/objective_item/steal/traitor/telebaton
 	name = "a head of staff's telescopic baton"
 	targetitem = /obj/item/melee/baton/telescopic
@@ -389,11 +398,6 @@
 
 /datum/objective_item/steal/supermatter/target_exists()
 	return GLOB.main_supermatter_engine != null
-
-/datum/objective_item/steal/holotool
-	name = "the holotool."
-	targetitem = /obj/item/holotool
-	excludefromjob = list(JOB_RESEARCH_DIRECTOR)
 
 // Doesn't need item_owner = (JOB_AI) because this handily functions as a murder objective if there isn't one
 /datum/objective_item/steal/functionalai
