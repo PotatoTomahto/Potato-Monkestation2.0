@@ -16,6 +16,10 @@
 	light_outer_range = 3
 	light_on = FALSE
 
+	///List of all modes this holotool can use.
+	var/static/list/datum/holotool_mode/possible_modes = list()
+	///List of all emagged modes.
+	var/static/list/datum/holotool_mode/emagged_modes = list()
 	/// The current mode
 	var/datum/holotool_mode/current_tool
 	var/current_light_color = "#48D1CC" //mediumturquoise
@@ -27,6 +31,20 @@
 /obj/item/holotool/Initialize(mapload)
 	. = ..()
 	AddElement(/datum/element/update_icon_updates_onmob, ITEM_SLOT_HANDS|ITEM_SLOT_BELT)
+	if(!length(possible_modes))
+		build_listing()
+
+/obj/item/holotool/proc/build_listing()
+	for(var/datum/holotool_mode/mode as anything in subtypesof(/datum/holotool_mode))
+		mode = new mode()
+		var/image/holotool_img = image(icon = icon, icon_state = icon_state)
+		var/image/tool_img = image(icon = icon, icon_state = mode::name)
+		tool_img.color = current_light_color
+		holotool_img.overlays += tool_img
+		if(mode.requires_emag)
+			emagged_modes[mode] = holotool_img
+		else
+			possible_modes[mode] = holotool_img
 
 /obj/item/holotool/examine(mob/user)
 	. = ..()
@@ -97,19 +115,8 @@
 	playsound(loc, 'sound/items/holotool.ogg', 100, 1, -1)
 	update_appearance(UPDATE_ICON)
 
-/obj/item/holotool/proc/build_listing()
-	var/list/possible_modes = list()
-	for(var/A in subtypesof(/datum/holotool_mode))
-		var/datum/holotool_mode/M = new A
-		if(M.can_be_used(src))
-			var/image/holotool_img = image(icon = icon, icon_state = icon_state)
-			var/image/tool_img = image(icon = icon, icon_state = M.name)
-			tool_img.color = current_light_color
-			holotool_img.overlays += tool_img
-			possible_modes[M] = holotool_img
-		else
-			qdel(M)
-	return possible_modes
+/obj/item/holotool/proc/return_usable_modes()
+	return (obj_flags & EMAGGED) ? possible_modes + emagged_modes : possible_modes
 
 // Handles color overlay of current holotool mode
 /obj/item/holotool/update_overlays()
@@ -142,9 +149,15 @@
 	return TRUE
 
 /obj/item/holotool/attack_self(mob/user)
-	var/list/possible_choices = build_listing()
-	var/chosen = show_radial_menu(user, src, possible_choices, custom_check = CALLBACK(src, PROC_REF(check_menu), user), require_near = TRUE)
-	if(!chosen)
+	var/list/possible_choices = return_usable_modes()
+	var/datum/holotool_mode/chosen = show_radial_menu(
+		user = user,
+		anchor = src,
+		choices = possible_choices,
+		custom_check = CALLBACK(src, PROC_REF(check_menu), user),
+		require_near = TRUE,
+	)
+	if(isnull(chosen))
 		return
 	switch_tool(user, chosen)
 
