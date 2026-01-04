@@ -37,10 +37,6 @@
 	///the component buffer
 	var/datum/weakref/component_buffer
 
-/obj/item/multitool/Initialize(mapload)
-	. = ..()
-	RegisterSignal(src, COMSIG_ATOM_MULTITOOL_GET_BUFFER, PROC_REF(get_buffer_on_signal))
-
 /obj/item/multitool/examine(mob/user)
 	. = ..()
 	. += span_notice("Its buffer [buffer?.resolve() ? "contains [buffer.resolve()]." : "is empty."]")
@@ -120,11 +116,6 @@
  */
 /obj/item/multitool/proc/set_buffer(datum/buffer)
 	src.buffer = WEAKREF(buffer)
-
-/// This proc is for datums sending COMSIG_ATOM_MULTITOOL_GET_BUFFER so multitool_get_buffer doesn't need to be a datum proc
-/obj/item/multitool/proc/get_buffer_on_signal(datum/source, list/buffer_result)
-	SIGNAL_HANDLER
-	buffer_result += buffer?.resolve()
 
 /**
  * Sets the multitool component buffer

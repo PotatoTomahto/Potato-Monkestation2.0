@@ -107,7 +107,3 @@
 
 /// Sent from [/datum/element/burn_on_item_ignition] to an atom being ignited by something: (mob/living/user, obj/item/burning_thing)
 #define COMSIG_ATOM_IGNITED_BY_ITEM "atom_ignited_by_item"
-
-/// Return the buffer of multitool-type items in the passed list, allowing datums to get multitool_get_buffer values
-/// Args: (list/buffer_result)
-#define COMSIG_ATOM_MULTITOOL_GET_BUFFER "atom_multitool_get_buffer"

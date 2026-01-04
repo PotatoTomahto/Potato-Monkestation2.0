@@ -31,9 +31,7 @@
 /datum/computer_file/program/scipaper_program/application_attackby(obj/item/attacking_item, mob/living/user)
 	if(!istype(attacking_item) || attacking_item.tool_behaviour != TOOL_MULTITOOL)
 		return FALSE
-	var/list/buffer_result = list() // because signals only send bitflags
-	SEND_SIGNAL(attacking_item, COMSIG_ATOM_MULTITOOL_GET_BUFFER, buffer_result)
-	var/datum/buffer = length(buffer_result) ? buffer_result[1] : null
+	var/datum/buffer = multitool_get_buffer(attacking_item)
 	if(!QDELETED(buffer) && istype(buffer, /datum/techweb))
 		linked_techweb = buffer
 	return TRUE
