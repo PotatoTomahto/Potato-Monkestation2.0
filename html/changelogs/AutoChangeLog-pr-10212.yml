@@ -1,5 +1,0 @@
-author: "flleeppyy"
-delete-after: True
-changes:
-  - rscadd: "Added button to runtime viewer to use monkestation ss13 json log viewer"
-  - admin: "add stealth follow to FLW buttons"
