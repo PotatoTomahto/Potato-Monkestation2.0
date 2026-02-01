@@ -92,10 +92,6 @@
 	if(.)
 		return
 
-	if(!issilicon(usr))
-		if(!istype(usr.get_active_held_item(), /obj/item/multitool))
-			return
-
 	var/obj/item/multitool/heldmultitool = get_multitool(operator)
 
 	switch(action)
@@ -150,15 +146,15 @@
 				. = remove_link(T, operator)
 		if("link")
 			if(heldmultitool)
-				var/obj/machinery/telecomms/T = heldmultitool.buffer
+				var/obj/machinery/telecomms/T = multitool_get_buffer(heldmultitool)
 				. = add_new_link(T, operator)
 		if("buffer") // monkestation start -- holotool support
 			if(heldmultitool)
-				multitool_set_buffer(usr, heldmultitool, src)
+				multitool_set_buffer(heldmultitool, src)
 			. = TRUE
 		if("flush")
 			if(heldmultitool)
-				multitool_set_buffer(usr, heldmultitool, null)
+				multitool_set_buffer(heldmultitool, null)
 			. = TRUE // monkestation end
 
 	add_act(action, params)
