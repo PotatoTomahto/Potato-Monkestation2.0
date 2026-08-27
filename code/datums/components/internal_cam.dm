@@ -8,7 +8,7 @@
 	///The camera object used to gather information for the camera net
 	var/obj/machinery/camera/bodcam
 
-/datum/component/internal_cam/Initialize(list/networks = list("ss13"), custom_ctag)
+/datum/component/internal_cam/Initialize(list/networks = list("ss13"), custom_ctag, emp_flags = EMP_PROTECT_SELF)
 	if(!isliving(parent) && !ismachinery(parent))
 		return COMPONENT_INCOMPATIBLE
 
@@ -20,7 +20,8 @@
 		lowercase_networks += LOWER_TEXT(network_name)
 	bodcam.network = lowercase_networks
 	bodcam.setViewRange(MAX_CAMERA_RANGE) //standard camera viewrange
-	bodcam.AddElement(/datum/element/empprotection, EMP_PROTECT_SELF)
+	if(emp_flags)
+		bodcam.AddElement(/datum/element/empprotection, emp_flags)
 
 /datum/component/internal_cam/Destroy(force, silent)
 	. = ..()

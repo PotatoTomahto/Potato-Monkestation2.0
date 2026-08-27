@@ -142,7 +142,7 @@
 	RegisterSignal(connected_ai, COMSIG_AI_ICON_CHANGE, PROC_REF(on_ai_screen_change))
 	INVOKE_ASYNC(connected_ai, TYPE_PROC_REF(/mob/living/silicon/ai, set_core_display_icon), null, connected_ai?.client)
 
-	LoadComponent(/datum/component/internal_cam, camera_networks, "[connected_ai.name] core display")
+	LoadComponent(/datum/component/internal_cam, networks = camera_networks, custom_ctag = "[connected_ai.name] core display", emp_flags = NONE)
 
 ///Called when the first AI of the round is created, as we get automatically assigned to it.
 /obj/machinery/status_display/ai_core/proc/on_ai_creation(atom/source, mob/living/silicon/ai/new_ai)
